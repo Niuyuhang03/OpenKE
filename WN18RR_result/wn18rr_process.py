@@ -1,170 +1,73 @@
 import itertools
 import json
 import re
+from nltk.corpus import wordnet as wn
 
-# 输出文件：FB15K237.content，FB15K237.relation。
-# FB15K237.content：每行第一列为entity id，最后一列为label，其他列为embedding feature。
-# FB15K237.relation：每行第一列为entity1 id，第二列为entity2 id，表示e1和e2之间有关系r。
-content_output_path = "C:/Users/14114/PycharmProjects/OpenKE/FB15K237_result/FB15K237.content"
-relation_output_path = "C:/Users/14114/PycharmProjects/OpenKE/FB15K237_result/FB15K237.relation"
+# 输出文件：WN18RR.content，WN18RR.relation。
+# WN18RR.content：每行第一列为entity id，最后一列为label，其他列为embedding feature。
+# WN18RR.relation：每行第一列为entity1 id，第二列为entity2 id，表示e1和e2之间有关系r。
+content_output_path = "C:/Users/14114/PycharmProjects/OpenKE/WN18RR_result/WN18RR.content"
+relation_output_path = "C:/Users/14114/PycharmProjects/OpenKE/WN18RR_result/WN18RR.relation"
 
-# 中间文件：FB15K237.type。
-# FB15K237.type，每行第一列为entity id，第二列为label。
-type_output_path = "C:/Users/14114/PycharmProjects/OpenKE/FB15K237_result/FB15K237.type"
+# 中间文件：WN18RR.type。
+# WN18RR.type，每行第一列为entity id，第二列为label。
+type_output_path = "C:/Users/14114/PycharmProjects/OpenKE/WN18RR_result/WN18RR.type"
 
-# 输入文件：entity2id.txt，entity2type.txt，FB15k_mid2description.txt，train2id.txt，TransE.json。
+# 输入文件：entity2id.txt，train2id.txt，TransE.json。
 # entity2id.txt：entity id和entity编号的对应关系，由OpenKE得到。
-# entity2type.txt：对entity初步分类的结果，由OpenKE得到。
-# FB15k_mid2description.txt：entity的描述信息，由OpenKE得到。
 # train2id.txt：entity的关系，由OpenKE的得到。
 # TransE.json：对entity进行TransE的embedding结果，由OpenKE的TransE得到。
-entity_path = "C:/Users/14114/PycharmProjects/OpenKE/benchmarks/FB15K237/entity2id.txt"
-entity_type_path = "C:/Users/14114/PycharmProjects/DKRL/data/entityType_split/entity2type.txt"
-entity_description_path = "C:/Users/14114/PycharmProjects/DKRL/data/FB15k_description/FB15k_mid2description.txt"
-relation_path = "C:/Users/14114/PycharmProjects/OpenKE/benchmarks/FB15K237/train2id.txt"
-data_path = "C:/Users/14114/PycharmProjects/OpenKE/FB15K237_result/TransE.json"
+entity_path = "C:/Users/14114/PycharmProjects/OpenKE/benchmarks/WN18RR/entity2id.txt"
+relation_path = "C:/Users/14114/PycharmProjects/OpenKE/benchmarks/WN18RR/train2id.txt"
+data_path = "C:/Users/14114/PycharmProjects/OpenKE/WN18RR_result/TransE.json"
 
-# not final label, correct_labels should be replaced with replace_labels
-correct_labels = ['film', 'actor', 'producer', 'director', 'county', 'university', 'writer', 'city', 'team', 'composer', 'award', 'region', 'capital', 'comedian', 'author', 'genre', 'country', 'state', 'label', 'songwriter', 'artist', 'company', 'instrument', 'province', 'cinematographer', 'language', 'designer', 'guitarist', 'meeting', 'area', 'zone', 'fiction', 'party', 'singer', 'event', 'school', 'player', 'philosopher', 'publisher', 'voice', 'editor', 'club', 'actress', 'winner', 'government', 'character', 'channel', 'taxonomy', 'program', 'sport', 'color', 'location', 'brand', 'organization', 'disease', 'chemical', 'religion', 'broadcaster', 'geographical', 'computer', 'ethnicity', 'job', 'software', 'subject', 'currency', 'profession', 'nutrient', 'position', 'sports', 'cause', 'form', 'fame', 'list', 'lists', 'parliament', 'month', 'military', 'degree', 'study', 'session', 'category', 'food']
+pos = ['n', 'v', 'a', 'r']
 
-bad_case = {'/m/0dnqr': ['film'], '/m/03p41': ['disease']}
-
-replace_labels = {'capital': 'city', 'club': 'team', 'label': 'record_label', 'actress': 'actor', 'genre': 'taxonomy', 'cause': 'taxonomy', 'category': 'taxonomy', 'zone': 'area', 'chemical': 'chemical_compound', 'sports': 'sport', 'fame': 'award', 'lists': 'list', 'parliament': 'meeting', 'session': 'meeting'}
-
-# make entity type to dictionary
-entity_type_file = open(entity_type_path, 'r')
-entity_type = {}
-for line in entity_type_file.readlines():
-    line = line.split()
-    entity = line.pop(0)
-    types = list(map(lambda y: y.split('/')[-1].split('_'), line))
-    types = list(set(itertools.chain.from_iterable(types)))
-    if '' in types:
-        types.remove('')
-    entity_type[entity] = types
-entity_type_file.close()
-
-# make entity description to dictionary
-entity_description_file = open(entity_description_path, 'r', encoding='utf-8')
-entity_description = {}
-start_words = [' is ', ' are ', ' was ', ' were ', ' be ']
-for line in entity_description_file.readlines():
-    entity = line.split()[0]
-    # starts = []
-    # for start_word in start_words:
-    #     if start_word in line:
-    #         starts.append(line.index(start_word))
-    # if len(starts) == 0:
-    #     start = line.index(line.split()[1])
-    # else:
-    #     start = min(starts)
-    line = re.split(r'[^a-zA-Z]', line)
-    descriptions = list(set(line[1:]))
-    entity_description[entity] = descriptions
-entity_description_file.close()
-
-# find entity type. 把description在该entity的correct type里筛选一次。再将其全部type放入correct type筛选一次。
+type_file = open(type_output_path, 'w')
 entity_file = open(entity_path, 'r')
 entity_lines = entity_file.readlines()[1:]
-type_file = open(type_output_path, 'w')
 data_file = open(data_path, 'r')
 data = json.load(data_file)['ent_embeddings.weight']
 content_file = open(content_output_path, 'w')
-
-miss_in_entity = []
-nolabel_entity = []
-all_labels = {}
 line_index = 0
 
+print('-------------process entity-------------')
 for line in entity_lines:
     entity, entityid = line.split()
-    # if entity in bad case
-    if bad_case.get(entity, None) is not None:
-        # write entity id
-        type_file.write(entityid)
-        content_file.write(entityid)
-        # write embedding data
-        cur_datas = data[line_index]
-        for cur_data in cur_datas:
-            content_file.write(' ' + str(cur_data))
-        # write labels
-        cnt = 0
-        for label in bad_case[entity]:
-            if cnt == 0:
-                cnt = 1
-                type_file.write(' ' + label.replace('\'', ''))
-                content_file.write(' ' + label.replace('\'', ''))
-            else:
-                type_file.write(',' + label.replace('\'', ''))
-                content_file.write(',' + label.replace('\'', ''))
-            all_labels[label] = all_labels.get(label, 0) + 1
-        # write \n
-        type_file.write('\n')
-        content_file.write('\n')
-        line_index += 1
-        continue
-    if entity_type.get(entity, None) is None and entity_description.get(entity, None) is None:
-        print(entity + ' doesn\'t in type or description')
-        miss_in_entity.append(entity)
+    entity = int(entity)
     type_file.write(entityid)
     content_file.write(entityid)
     labels = []
-    if entity in entity_description:
-        descriptions = entity_description[entity]
-        for description in descriptions:
-            if description.lower() in correct_labels:
-                if description.lower() in replace_labels:
-                    labels.append(replace_labels[description.lower()])
-                else:
-                    labels.append(description.lower())
-    if entity in entity_type:
-        types = entity_type[entity]
-        for type in types:
-            if type.lower() in correct_labels:
-                if type.lower() in replace_labels:
-                    labels.append(replace_labels[type.lower()])
-                else:
-                    labels.append(type.lower())
+    for cur_pos in pos:
+        try:
+            wn.synset_from_pos_and_offset(cur_pos, entity)
+            labels.append(cur_pos)
+        except:
+            pass
     if len(labels) == 0:
-        print(entity + " label is 0. ")
-        if entity in entity_type:
-            print(entity_type[entity])
-        type_file.write('\n')
-        content_file.write('\n')
-        nolabel_entity.append(entity)
-        line_index += 1
-        continue
-    cur_datas = data[line_index]
-    for cur_data in cur_datas:
-        content_file.write(' ' + str(cur_data))
-    cnt = 0
-    for label in set(labels):
-        all_labels[label] = all_labels.get(label, 0) + 1
-        if cnt == 0:
-            cnt = 1
-            type_file.write(' ' + label.replace('\'', ''))
-            content_file.write(' ' + label.replace('\'', ''))
-        else:
-            type_file.write(',' + label.replace('\'', ''))
-            content_file.write(',' + label.replace('\'', ''))
+        print(entity + ' has no pos in synset\n')
+    else:
+        cur_datas = data[line_index]
+        for cur_data in cur_datas:
+            content_file.write(' ' + str(cur_data))
+        cnt = 0
+        for label in labels:
+            if cnt == 0:
+                cnt = 1
+                type_file.write(' ' + label)
+                content_file.write(' ' + label)
+            else:
+                type_file.write(',' + label)
+                content_file.write(' ' + label)
     type_file.write('\n')
     content_file.write('\n')
     line_index += 1
-entity_file.close()
 type_file.close()
-data_file.close()
+entity_file.close()
 content_file.close()
+data_file.close()
 
-print('-------------result-------------')
-print('cnt all labels ', str(len(all_labels)))
-sorted_all_label = sorted(all_labels.items(), key = lambda x: x[1], reverse = True)
-print('all labels cnt: ', sorted_all_label)
-print('all labels: ', [label for label in all_labels])
-print('-------------error-------------')
-print('cnt no label ', str(len(nolabel_entity)))
-print('cnt miss in type and description', str(len(set(miss_in_entity))))
-print('-------------error end-------------')
-
+print('-------------process relation-------------')
 relation_file = open(relation_path, 'r')
 relation_output_file = open(relation_output_path, 'w')
 relation_lines = relation_file.readlines()[1:]
