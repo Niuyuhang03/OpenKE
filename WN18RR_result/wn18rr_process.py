@@ -34,20 +34,21 @@ entity_description = {}
 start_words = [' is ', ' are ', ' was ', ' were ', ' be ']
 for line in entity_description_file.readlines():
     entity = line.split()[0]
-    # starts = []
-    # for start_word in start_words:
-    #     if start_word in line:
-    #         starts.append(line.index(start_word))
-    # if len(starts) == 0:
-    #     start = line.index(line.split()[1])
-    # else:
-    #     start = min(starts)
-    line = re.split(r'[^a-zA-Z]', line)
+    starts = []
+    for start_word in start_words:
+        if start_word in line:
+            starts.append(line.index(start_word))
+    if len(starts) == 0:
+        start = line.index(line.split()[1])
+    else:
+        start = min(starts)
+    line = re.split(r'[^a-zA-Z]', line[start:])
     descriptions = list(set(line[1:]))
     entity_description[entity] = descriptions
 entity_description_file.close()
 
 # find entity type
+print('-------------find entity type-------------')
 entity_file = open(entity_path, 'r')
 entity_lines = entity_file.readlines()[1:]
 content_file = open(content_output_path, 'w')
