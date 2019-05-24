@@ -14,8 +14,8 @@ type_output_path = "C:/Users/14114/PycharmProjects/OpenKE/FB15K237_result/FB15K2
 
 # 输入文件：entity2id.txt，entity2type.txt，FB15k_mid2description.txt，train2id.txt，TransE.json。
 # entity2id.txt：entity id和entity编号的对应关系，由OpenKE得到。
-# entity2type.txt：对entity初步分类的结果，由OpenKE得到。
-# FB15k_mid2description.txt：entity的描述信息，由OpenKE得到。
+# entity2type.txt：对entity初步分类的结果，由DKRL得到。
+# FB15k_mid2description.txt：entity的描述信息，由DKRL得到。
 # train2id.txt：entity的关系，由OpenKE的得到。
 # TransE.json：对entity进行TransE的embedding结果，由OpenKE的TransE得到。
 entity_path = "C:/Users/14114/PycharmProjects/OpenKE/benchmarks/FB15K237/entity2id.txt"
