@@ -135,3 +135,7 @@ venv.bak/
 
 #Backup files
 *.py.bak
+
+FB15K237_checkpoint
+WN18RR_checkpoint
+
