@@ -58,7 +58,7 @@ for line in entity_lines:
                 content_file.write(' ' + label)
             else:
                 type_file.write(',' + label)
-                content_file.write(' ' + label)
+                content_file.write(',' + label)
     type_file.write('\n')
     content_file.write('\n')
     line_index += 1
