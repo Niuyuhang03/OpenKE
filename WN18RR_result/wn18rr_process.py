@@ -71,8 +71,13 @@ print('-------------process relation-------------')
 relation_file = open(relation_path, 'r')
 relation_output_file = open(relation_output_path, 'w')
 relation_lines = relation_file.readlines()[1:]
+my_dic = {}
 for line in relation_lines:
     e1, e2, r =line.split()
-    relation_output_file.write(str(e1) + ' ' + str(e2) + '\n')
+    if (my_dic.get(e1, None) is None or e2 not in my_dic[e1]) and (my_dic.get(e2, None) is None or e1 not in my_dic[e2]):
+        my_dic[e1] = my_dic.get(e1, []) + [e2]
+        relation_output_file.write(str(e1) + ' ' + str(e2) + '\n')
+    else:
+        print(str(e2) + " is already in " + str(e1))
 relation_file.close()
 relation_output_file.close()
