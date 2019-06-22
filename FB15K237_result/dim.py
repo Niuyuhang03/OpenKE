@@ -28,7 +28,7 @@ for line in lines:
     break
 print('\n')
 
-f = open('FB15K237.relation')
+f = open('FB15K237.cites')
 print("FB15K237.cites:")
 lines = f.readlines()
 print(len(lines))
@@ -48,7 +48,7 @@ for line in lines:
     break
 print('\n')
 
-f = open('../WN18RR_result/WN18RR.relation')
+f = open('../WN18RR_result/WN18RR.cites')
 print("WN18RR.cites:")
 lines = f.readlines()
 print(len(lines))
