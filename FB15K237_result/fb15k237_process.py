@@ -2,6 +2,10 @@ import itertools
 import json
 import re
 
+'''
+配置环境
+'''
+print("-------------get conf-------------")
 # 输出文件：FB15K237.content，FB15K237.cites。
 # FB15K237.content：每行第一列为entity id，最后一列为label，其他列为embedding feature。
 # FB15K237.cites：每行第一列为entity1 id，第二列为entity2 id，表示e1和e2之间有关系r。
@@ -16,8 +20,8 @@ type_output_path = "C:/Users/14114/PycharmProjects/OpenKE/FB15K237_result/FB15K2
 # entity2id.txt：entity id和entity编号的对应关系，由OpenKE得到。
 # entity2type.txt：对entity初步分类的结果，由DKRL得到。
 # FB15k_mid2description.txt：entity的描述信息，由DKRL得到。
-# train2id.txt：entity的关系，由OpenKE的得到。
-# TransE.json：对entity进行TransE的embedding结果，由OpenKE的TransE得到。
+# train2id valid2id test2id.txt：entity的关系，由OpenKE的得到。
+# TransE.json：对entity进行TransE的embedding结果，由TransE得到。
 entity_path = "C:/Users/14114/PycharmProjects/OpenKE/benchmarks/FB15K237/entity2id.txt"
 entity_type_path = "C:/Users/14114/PycharmProjects/DKRL/data/entityType_split/entity2type.txt"
 entity_description_path = "C:/Users/14114/PycharmProjects/DKRL/data/FB15k_description/FB15k_mid2description.txt"
@@ -27,16 +31,24 @@ relation_path_test = "C:/Users/14114/PycharmProjects/OpenKE/benchmarks/FB15K237/
 data_path = "C:/Users/14114/PycharmProjects/OpenKE/FB15K237_result/TransE.json"
 
 # not final label, correct_labels should be replaced with replace_labels
-correct_labels = ['film', 'actor', 'producer', 'director', 'county', 'university', 'writer', 'city', 'team', 'composer', 'award', 'region', 'capital', 'comedian', 'author', 'genre', 'country', 'state', 'label', 'songwriter', 'artist', 'company', 'instrument', 'province', 'cinematographer', 'language', 'designer', 'guitarist', 'meeting', 'area', 'zone', 'fiction', 'party', 'singer', 'event', 'school', 'player', 'philosopher', 'publisher', 'voice', 'editor', 'club', 'actress', 'winner', 'government', 'character', 'channel', 'taxonomy', 'program', 'sport', 'color', 'location', 'brand', 'organization', 'disease', 'chemical', 'religion', 'broadcaster', 'geographical', 'computer', 'ethnicity', 'job', 'software', 'subject', 'currency', 'profession', 'nutrient', 'position', 'sports', 'cause', 'form', 'fame', 'list', 'lists', 'parliament', 'month', 'military', 'degree', 'study', 'session', 'category', 'food']
+correct_labels = ['film', 'actor', 'producer', 'director', 'county', 'university', 'writer', 'city', 'team', 'composer', 'award', 'region', 'capital', 'comedian', 'author', 'genre', 'country', 'state', 'label', 'songwriter', 'artist', 'company', 'province', 'cinematographer', 'language', 'designer', 'guitarist', 'meeting', 'area', 'zone', 'fiction', 'party', 'singer', 'event', 'school', 'player', 'publisher', 'voice', 'editor', 'club', 'actress', 'winner', 'government', 'character', 'channel', 'taxonomy', 'program', 'sport', 'location', 'brand', 'organization', 'religion', 'computer', 'job', 'subject', 'profession', 'position', 'sports', 'cause', 'form', 'fame', 'list', 'lists', 'parliament', 'military', 'degree', 'study', 'session', 'category', 'food']
 
-bad_case = {'/m/0dnqr': ['film'], '/m/03p41': ['disease']}
+bad_case = {'/m/0dnqr': ['film']}
 
-replace_labels = {'capital': 'city', 'club': 'team', 'label': 'record_label', 'actress': 'actor', 'genre': 'taxonomy', 'cause': 'taxonomy', 'category': 'taxonomy', 'zone': 'area', 'chemical': 'chemical_compound', 'sports': 'sport', 'fame': 'award', 'lists': 'list', 'parliament': 'meeting', 'session': 'meeting'}
+replace_labels = {'capital': 'city', 'club': 'team', 'label': 'record_label', 'actress': 'actor', 'genre': 'taxonomy', 'cause': 'taxonomy', 'category': 'taxonomy', 'zone': 'area', 'sports': 'sport', 'fame': 'award', 'lists': 'list', 'parliament': 'meeting', 'session': 'meeting'}
 
-process_content = False
+process_content = True
 process_cites = True
+delete_entities = []
 
+print("-------------get conf finished-------------")
+
+
+'''
+处理.content文件
+'''
 if process_content:
+    print("-------------process content-------------")
     # make entity type to dictionary
     entity_type_file = open(entity_type_path, 'r')
     entity_type = {}
@@ -56,14 +68,6 @@ if process_content:
     start_words = [' is ', ' are ', ' was ', ' were ', ' be ']
     for line in entity_description_file.readlines():
         entity = line.split()[0]
-        # starts = []
-        # for start_word in start_words:
-        #     if start_word in line:
-        #         starts.append(line.index(start_word))
-        # if len(starts) == 0:
-        #     start = line.index(line.split()[1])
-        # else:
-        #     start = min(starts)
         line = re.split(r'[^a-zA-Z]', line)
         descriptions = list(set(line[1:]))
         entity_description[entity] = descriptions
@@ -111,9 +115,8 @@ if process_content:
             continue
         if entity_type.get(entity, None) is None and entity_description.get(entity, None) is None:
             print(entity + ' doesn\'t in type or description')
-            miss_in_entity.append(entity)
-        type_file.write(entityid)
-        content_file.write(entityid)
+            delete_entities.append(entity)
+            miss_in_entity.append(entityid)
         labels = []
         if entity in entity_description:
             descriptions = entity_description[entity]
@@ -135,11 +138,12 @@ if process_content:
             print(entity + " label is 0. ")
             if entity in entity_type:
                 print(entity_type[entity])
-            type_file.write('\n')
-            content_file.write('\n')
             nolabel_entity.append(entity)
+            delete_entities.append(entityid)
             line_index += 1
             continue
+        type_file.write(entityid)
+        content_file.write(entityid)
         cur_datas = data[line_index]
         for cur_data in cur_datas:
             content_file.write(' ' + str(cur_data))
@@ -169,9 +173,17 @@ if process_content:
     print('-------------error-------------')
     print('cnt no label ', str(len(nolabel_entity)))
     print('cnt miss in type and description', str(len(set(miss_in_entity))))
+    print('all entities which is deleted ', delete_entities)
+    print('all entities cnt which is deleted ', len(delete_entities))
     print('-------------error end-------------')
+    print("-------------process content finished")
 
+
+'''
+处理.cites文件
+'''
 if process_cites:
+    print("-------------process cites-------------")
     relation_train_file = open(relation_path_train, 'r')
     relation_valid_file = open(relation_path_valid, 'r')
     relation_test_file = open(relation_path_test, 'r')
@@ -179,20 +191,25 @@ if process_cites:
 
     relation_lines = relation_train_file.readlines()[1:] + relation_valid_file.readlines()[1:] + relation_test_file.readlines()[1:]
     my_dic = {}
+    delete_cnt = 0
     for line in relation_lines:
         e1, e2, r =line.split()
+        if e1 in delete_entities or e2 in delete_entities:
+            continue
         if (my_dic.get(e1, None) is None or e2 not in my_dic[e1]) and (my_dic.get(e2, None) is None or e1 not in my_dic[e2]):
             my_dic[e1] = my_dic.get(e1, []) + [e2]
             relation_output_file.write(str(e1) + ' ' + str(e2) + '\n')
         else:
-            print(str(e2) + " is already in " + str(e1))
+            delete_cnt += 1
+            # print(str(e2) + " is already in " + str(e1))
+    print("{:d} entities are deleted in cites.".format(delete_cnt))
     relation_train_file.close()
     relation_valid_file.close()
     relation_test_file.close()
     relation_output_file.close()
+    print("-------------process cites finished-------------")
 
-# cnt all labels  70
+# cnt all labels  58
 
-# all labels cnt:  [('film', 7243), ('award', 7175), ('actor', 4179), ('winner', 3744), ('location', 3296), ('organization', 2970), ('city', 2921), ('producer', 2671), ('subject', 2616), ('area', 2594), ('region', 2545), ('artist', 2416), ('team', 2199), ('taxonomy', 2194), ('sport', 2187), ('director', 1952), ('state', 1911), ('program', 1792), ('writer', 1648), ('author', 1626), ('university', 1416), ('county', 1395), ('character', 1122), ('country', 1091), ('fiction', 1061), ('composer', 999), ('company', 987), ('school', 928), ('military', 858), ('singer', 827), ('government', 763), ('songwriter', 643), ('list', 622), ('form', 588), ('voice', 558), ('event', 500), ('language', 478), ('player', 472), ('study', 397), ('comedian', 387), ('province', 361), ('guitarist', 337), ('record_label', 333), ('position', 324), ('computer', 310), ('meeting', 297), ('party', 282), ('designer', 277), ('degree', 255), ('editor', 253), ('profession', 253), ('channel', 225), ('job', 208), ('publisher', 196), ('cinematographer', 188), ('food', 177), ('brand', 170), ('religion', 160), ('disease', 152), ('instrument', 151), ('software', 149), ('geographical', 141), ('color', 112), ('chemical_compound', 107), ('ethnicity', 91), ('philosopher', 88), ('month', 79), ('nutrient', 72), ('broadcaster', 30), ('currency', 23)]
-
-# all labels:  ['country', 'team', 'city', 'organization', 'area', 'region', 'taxonomy', 'location', 'sport', 'military', 'state', 'government', 'subject', 'form', 'company', 'program', 'award', 'film', 'voice', 'actor', 'school', 'language', 'fiction', 'winner', 'position', 'producer', 'writer', 'director', 'singer', 'comedian', 'instrument', 'study', 'event', 'author', 'composer', 'artist', 'county', 'computer', 'geographical', 'character', 'editor', 'publisher', 'degree', 'university', 'list', 'job', 'profession', 'religion', 'player', 'guitarist', 'brand', 'songwriter', 'cinematographer', 'meeting', 'currency', 'food', 'party', 'designer', 'province', 'channel', 'software', 'disease', 'color', 'record_label', 'ethnicity', 'broadcaster', 'philosopher', 'month', 'chemical_compound', 'nutrient']
+# all labels cnt:  [('film', 7243), ('award', 7175), ('actor', 4179), ('winner', 3744), ('location', 3296), ('organization', 2970), ('city', 2921), ('producer', 2671), ('subject', 2616), ('area', 2594), ('region', 2545), ('artist', 2416), ('team', 2199), ('taxonomy', 2194), ('sport', 2187), ('director', 1952), ('state', 1911), ('program', 1792), ('writer', 1648), ('author', 1626), ('university', 1416), ('county', 1395), ('character', 1122), ('country', 1091), ('fiction', 1061), ('composer', 999), ('company', 987), ('school', 928), ('military', 858), ('singer', 827), ('government', 763), ('songwriter', 643), ('list', 622), ('form', 588), ('voice', 558), ('event', 500), ('language', 478), ('player', 472), ('study', 397), ('comedian', 387), ('province', 361), ('guitarist', 337), ('record_label', 333), ('position', 324), ('computer', 310), ('meeting', 297), ('party', 282), ('designer', 277), ('degree', 255), ('editor', 253), ('profession', 253), ('channel', 225), ('job', 208), ('publisher', 196), ('cinematographer', 188), ('food', 177), ('brand', 170), ('religion', 160)]
+# all labels:  ['team', 'location', 'sport', 'government', 'country', 'area', 'city', 'military', 'region', 'state', 'subject', 'organization', 'taxonomy', 'form', 'program', 'company', 'film', 'award', 'voice', 'actor', 'school', 'language', 'winner', 'fiction', 'position', 'singer', 'writer', 'producer', 'director', 'comedian', 'study', 'event', 'author', 'artist', 'composer', 'county', 'computer', 'character', 'editor', 'publisher', 'university', 'degree', 'list', 'job', 'profession', 'religion', 'guitarist', 'player', 'brand', 'songwriter', 'cinematographer', 'meeting', 'food', 'party', 'designer', 'province', 'channel', 'record_label']
