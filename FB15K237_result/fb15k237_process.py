@@ -189,7 +189,7 @@ if process_cites:
     relation_test_file = open(relation_path_test, 'r')
     relation_output_file = open(relation_output_path, 'w')
 
-    relation_lines = relation_train_file.readlines()[1:]# + relation_valid_file.readlines()[1:] + relation_test_file.readlines()[1:]
+    relation_lines = relation_train_file.readlines()[1:] + relation_valid_file.readlines()[1:] + relation_test_file.readlines()[1:]
     my_dic = {}
     delete_cnt = 0
     for line in relation_lines:
