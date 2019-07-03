@@ -9,12 +9,12 @@ print("-------------get conf-------------")
 # 输出文件：FB15K237.content，FB15K237.cites。
 # FB15K237.content：每行第一列为entity id，最后一列为label，其他列为embedding feature。
 # FB15K237.cites：每行第一列为entity1 id，第二列为entity2 id，表示e1和e2之间有关系r。
-content_output_path = "C:/Users/14114/PycharmProjects/OpenKE/FB15K237_result/FB15K237.content"
-relation_output_path = "C:/Users/14114/PycharmProjects/OpenKE/FB15K237_result/FB15K237.cites"
+content_output_path = "E:/PycharmProjects/OpenKE/FB15K237_result/FB15K237.content"
+relation_output_path = "E:/PycharmProjects/OpenKE/FB15K237_result/FB15K237.cites"
 
 # 中间文件：FB15K237.type。
 # FB15K237.type，每行第一列为entity id，第二列为label。
-type_output_path = "C:/Users/14114/PycharmProjects/OpenKE/FB15K237_result/FB15K237.type"
+type_output_path = "E:/PycharmProjects/OpenKE/FB15K237_result/FB15K237.type"
 
 # 输入文件：entity2id.txt，entity2type.txt，FB15k_mid2description.txt，train2id.txt，TransE.json。
 # entity2id.txt：entity id和entity编号的对应关系，由OpenKE得到。
@@ -22,13 +22,13 @@ type_output_path = "C:/Users/14114/PycharmProjects/OpenKE/FB15K237_result/FB15K2
 # FB15k_mid2description.txt：entity的描述信息，由DKRL得到。
 # train2id valid2id test2id.txt：entity的关系，由OpenKE的得到。
 # TransE.json：对entity进行TransE的embedding结果，由TransE得到。
-entity_path = "C:/Users/14114/PycharmProjects/OpenKE/benchmarks/FB15K237/entity2id.txt"
-entity_type_path = "C:/Users/14114/PycharmProjects/DKRL/data/entityType_split/entity2type.txt"
-entity_description_path = "C:/Users/14114/PycharmProjects/DKRL/data/FB15k_description/FB15k_mid2description.txt"
-relation_path_train = "C:/Users/14114/PycharmProjects/OpenKE/benchmarks/FB15K237/train2id.txt"
-relation_path_valid = "C:/Users/14114/PycharmProjects/OpenKE/benchmarks/FB15K237/valid2id.txt"
-relation_path_test = "C:/Users/14114/PycharmProjects/OpenKE/benchmarks/FB15K237/test2id.txt"
-data_path = "C:/Users/14114/PycharmProjects/OpenKE/FB15K237_result/TransE.json"
+entity_path = "E:/PycharmProjects/OpenKE/benchmarks/FB15K237/entity2id.txt"
+entity_type_path = "E:/PycharmProjects/DKRL/data/entityType_split/entity2type.txt"
+entity_description_path = "E:/PycharmProjects/DKRL/data/FB15k_description/FB15k_mid2description.txt"
+relation_path_train = "E:/PycharmProjects/OpenKE/benchmarks/FB15K237/train2id.txt"
+relation_path_valid = "E:/PycharmProjects/OpenKE/benchmarks/FB15K237/valid2id.txt"
+relation_path_test = "E:/PycharmProjects/OpenKE/benchmarks/FB15K237/test2id.txt"
+data_path = "E:/PycharmProjects/OpenKE/FB15K237_result/TransE.json"
 
 # not final label, correct_labels should be replaced with replace_labels
 correct_labels = ['film', 'actor', 'producer', 'directordirector', 'county', 'university', 'writer', 'city', 'team', 'composer', 'award', 'region', 'capital', 'comedian', 'author', 'genre', 'country', 'state', 'label', 'songwriter', 'artist', 'company', 'province', 'cinematographer', 'language', 'designer', 'guitarist', 'meeting', 'area', 'zone', 'fiction', 'party', 'singer', 'event', 'school', 'player', 'publisher', 'voice', 'editor', 'club', 'actress', 'winner', 'government', 'character', 'channel', 'taxonomy', 'program', 'sport', 'location', 'brand', 'organization', 'religion', 'computer', 'job', 'subject', 'profession', 'position', 'sports', 'cause', 'form', 'fame', 'list', 'lists', 'parliament', 'military', 'degree', 'study', 'session', 'category', 'food', 'broadcaster']
@@ -189,7 +189,7 @@ if process_cites:
     relation_test_file = open(relation_path_test, 'r')
     relation_output_file = open(relation_output_path, 'w')
 
-    relation_lines = relation_train_file.readlines()[1:] + relation_valid_file.readlines()[1:] + relation_test_file.readlines()[1:]
+    relation_lines = relation_train_file.readlines()[1:]# + relation_valid_file.readlines()[1:] + relation_test_file.readlines()[1:]
     my_dic = {}
     delete_cnt = 0
     for line in relation_lines:

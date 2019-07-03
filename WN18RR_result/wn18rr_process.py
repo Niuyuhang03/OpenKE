@@ -6,22 +6,22 @@ from nltk.corpus import wordnet as wn
 # 输出文件：WN18RR.content，WN18RR.cites。
 # WN18RR.content：每行第一列为entity id，最后一列为label，其他列为embedding feature。
 # WN18RR.cites：每行第一列为entity1 id，第二列为entity2 id，表示e1和e2之间有关系r。
-content_output_path = "C:/Users/14114/PycharmProjects/OpenKE/WN18RR_result/WN18RR.content"
-relation_output_path = "C:/Users/14114/PycharmProjects/OpenKE/WN18RR_result/WN18RR.cites"
+content_output_path = "E:/PycharmProjects/OpenKE/WN18RR_result/WN18RR.content"
+relation_output_path = "E:/PycharmProjects/OpenKE/WN18RR_result/WN18RR.cites"
 
 # 中间文件：WN18RR.type。
 # WN18RR.type，每行第一列为entity id，第二列为label。
-type_output_path = "C:/Users/14114/PycharmProjects/OpenKE/WN18RR_result/WN18RR.type"
+type_output_path = "E:/PycharmProjects/OpenKE/WN18RR_result/WN18RR.type"
 
 # 输入文件：entity2id.txt，train2id.txt，TransE.json。
 # entity2id.txt：entity id和entity编号的对应关系，由OpenKE得到。
 # train2id.txt：entity的关系，由OpenKE的得到。
 # TransE.json：对entity进行TransE的embedding结果，由OpenKE的TransE得到。
-entity_path = "C:/Users/14114/PycharmProjects/OpenKE/benchmarks/WN18RR/entity2id.txt"
-relation_train_path = "C:/Users/14114/PycharmProjects/OpenKE/benchmarks/WN18RR/train2id.txt"
-relation_valid_path = "C:/Users/14114/PycharmProjects/OpenKE/benchmarks/WN18RR/valid2id.txt"
-relation_test_path = "C:/Users/14114/PycharmProjects/OpenKE/benchmarks/WN18RR/test2id.txt"
-data_path = "C:/Users/14114/PycharmProjects/OpenKE/WN18RR_result/TransE.json"
+entity_path = "E:/PycharmProjects/OpenKE/benchmarks/WN18RR/entity2id.txt"
+relation_train_path = "E:/PycharmProjects/OpenKE/benchmarks/WN18RR/train2id.txt"
+relation_valid_path = "E:/PycharmProjects/OpenKE/benchmarks/WN18RR/valid2id.txt"
+relation_test_path = "E:/PycharmProjects/OpenKE/benchmarks/WN18RR/test2id.txt"
+data_path = "E:/PycharmProjects/OpenKE/WN18RR_result/TransE.json"
 
 process_content = False
 process_cites = True
