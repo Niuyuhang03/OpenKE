@@ -23,7 +23,7 @@ relation_valid_path = "E:/PycharmProjects/OpenKE/benchmarks/WN18RR/valid2id.txt"
 relation_test_path = "E:/PycharmProjects/OpenKE/benchmarks/WN18RR/test2id.txt"
 data_path = "E:/PycharmProjects/OpenKE/WN18RR_result/TransE.json"
 
-process_content = False
+process_content = True
 process_cites = True
 
 if process_content:
