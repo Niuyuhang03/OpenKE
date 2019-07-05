@@ -96,14 +96,14 @@ if process_content:
             # write embedding data
             cur_datas = data[line_index]
             for cur_data in cur_datas:
-                content_file.write(' ' + str(cur_data))
+                content_file.write('\t' + str(cur_data))
             # write labels
             cnt = 0
             for label in bad_case[entity]:
                 if cnt == 0:
                     cnt = 1
-                    type_file.write(' ' + label.replace('\'', ''))
-                    content_file.write(' ' + label.replace('\'', ''))
+                    type_file.write('\t' + label.replace('\'', ''))
+                    content_file.write('\t' + label.replace('\'', ''))
                 else:
                     type_file.write(',' + label.replace('\'', ''))
                     content_file.write(',' + label.replace('\'', ''))
@@ -146,14 +146,14 @@ if process_content:
         content_file.write(entityid)
         cur_datas = data[line_index]
         for cur_data in cur_datas:
-            content_file.write(' ' + str(cur_data))
+            content_file.write('\t' + str(cur_data))
         cnt = 0
         for label in set(labels):
             all_labels[label] = all_labels.get(label, 0) + 1
             if cnt == 0:
                 cnt = 1
-                type_file.write(' ' + label.replace('\'', ''))
-                content_file.write(' ' + label.replace('\'', ''))
+                type_file.write('\t' + label.replace('\'', ''))
+                content_file.write('\t' + label.replace('\'', ''))
             else:
                 type_file.write(',' + label.replace('\'', ''))
                 content_file.write(',' + label.replace('\'', ''))
@@ -198,7 +198,7 @@ if process_cites:
             continue
         if (my_dic.get(e1, None) is None or e2 not in my_dic[e1]) and (my_dic.get(e2, None) is None or e1 not in my_dic[e2]):
             my_dic[e1] = my_dic.get(e1, []) + [e2]
-            relation_output_file.write(str(e1) + ' ' + str(e2) + '\n')
+            relation_output_file.write(str(e1) + '\t' + str(e2) + '\n')
         else:
             delete_cnt += 1
             # print(str(e2) + " is already in " + str(e1))

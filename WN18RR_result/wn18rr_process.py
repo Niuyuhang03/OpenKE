@@ -56,13 +56,13 @@ if process_content:
         else:
             cur_datas = data[line_index]
             for cur_data in cur_datas:
-                content_file.write(' ' + str(cur_data))
+                content_file.write('\t' + str(cur_data))
             cnt = 0
             for label in labels:
                 if cnt == 0:
                     cnt = 1
-                    type_file.write(' ' + label)
-                    content_file.write(' ' + label)
+                    type_file.write('\t' + label)
+                    content_file.write('\t' + label)
                 else:
                     type_file.write(',' + label)
                     content_file.write(',' + label)
@@ -88,7 +88,7 @@ if process_cites:
         e1, e2, r =line.split()
         if (my_dic.get(e1, None) is None or e2 not in my_dic[e1]) and (my_dic.get(e2, None) is None or e1 not in my_dic[e2]):
             my_dic[e1] = my_dic.get(e1, []) + [e2]
-            relation_output_file.write(str(e1) + ' ' + str(e2) + '\n')
+            relation_output_file.write(str(e1) + '\t' + str(e2) + '\n')
         else:
             print(str(e2) + " is already in " + str(e1))
     relation_file_train.close()
