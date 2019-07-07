@@ -23,7 +23,10 @@ class TransE(Model):
 		return torch.norm(h + r - t, self.config.p_norm, -1)
 	
 	def loss(self, p_score, n_score):
-		y = Variable(torch.Tensor([-1]).cuda())
+		if self.config.use_gpu:
+			y = Variable(torch.Tensor([-1]).cuda())
+		else:
+			y = Variable(torch.Tensor([-1]))
 		return self.criterion(p_score, n_score, y)
 
 	def forward(self):
@@ -34,6 +37,7 @@ class TransE(Model):
 		p_score = self.get_positive_score(score)
 		n_score = self.get_negative_score(score)
 		return self.loss(p_score, n_score)	
+
 	def predict(self):
 		h = self.ent_embeddings(self.batch_h)
 		t = self.ent_embeddings(self.batch_t)
