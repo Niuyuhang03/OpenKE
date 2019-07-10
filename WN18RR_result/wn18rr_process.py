@@ -104,13 +104,18 @@ if process_cites:
 
     triple_lines = train_file.readlines()[1:] + valid_file.readlines()[1:] + test_file.readlines()[1:]
     my_dic = {}
+    delete_cnt = 0
     for line in triple_lines:
         e1, e2, r =line.split()
-        if (my_dic.get(e1, None) is None or e2 not in my_dic[e1]) and (my_dic.get(e2, None) is None or e1 not in my_dic[e2]):
-            my_dic[e1] = my_dic.get(e1, []) + [e2]
+        if (my_dic.get(str(e1) + '+' + str(e2), None) is None or r not in my_dic[str(e1) + '+' + str(e2)]) and (
+                my_dic.get(str(e2) + '+' + str(e1), None) is None or r not in my_dic[str(e2) + '+' + str(e1)]):
+            my_dic[str(e1) + '+' + str(e2)] = my_dic.get(str(e1) + '+' + str(e2), []) + [r]
+            my_dic[str(e2) + '+' + str(e1)] = my_dic.get(str(e2) + '+' + str(e1), []) + [r]
             cites_output_file.write(str(e1) + '\t' + str(e2) + '\t' + str(r) + '\n')
         else:
+            delete_cnt += 1
             print(str(e2) + " is already in " + str(e1))
+    print("{:d} entities are deleted in cites.".format(delete_cnt))
     train_file.close()
     valid_file.close()
     test_file.close()
