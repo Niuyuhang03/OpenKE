@@ -9,8 +9,10 @@ print("-------------get conf-------------")
 # 输出文件：FB15K237.content，FB15K237.cites。
 # FB15K237.content：每行第一列为entity id，最后一列为label，其他列为embedding feature。
 # FB15K237.cites：每行第一列为entity1 id，第二列为entity2 id，表示e1和e2之间有关系r。
+# FB15K237.rel：对rel进行embedding的结果。
 content_output_path = "E:/PycharmProjects/OpenKE/FB15K237_result/FB15K237.content"
-relation_output_path = "E:/PycharmProjects/OpenKE/FB15K237_result/FB15K237.cites"
+cites_output_path = "E:/PycharmProjects/OpenKE/FB15K237_result/FB15K237.cites"
+rel_output_path = "E:/PycharmProjects/OpenKE/FB15K237_result/FB15K237.rel"
 
 # 中间文件：FB15K237.type。
 # FB15K237.type，每行第一列为entity id，第二列为label。
@@ -25,9 +27,10 @@ type_output_path = "E:/PycharmProjects/OpenKE/FB15K237_result/FB15K237.type"
 entity_path = "E:/PycharmProjects/OpenKE/benchmarks/FB15K237/entity2id.txt"
 entity_type_path = "E:/PycharmProjects/DKRL/data/entityType_split/entity2type.txt"
 entity_description_path = "E:/PycharmProjects/DKRL/data/FB15k_description/FB15k_mid2description.txt"
-relation_path_train = "E:/PycharmProjects/OpenKE/benchmarks/FB15K237/train2id.txt"
-relation_path_valid = "E:/PycharmProjects/OpenKE/benchmarks/FB15K237/valid2id.txt"
-relation_path_test = "E:/PycharmProjects/OpenKE/benchmarks/FB15K237/test2id.txt"
+relation_path = "E:/PycharmProjects/OpenKE/benchmarks/FB15K237/relation2id.txt"
+train_path = "E:/PycharmProjects/OpenKE/benchmarks/FB15K237/train2id.txt"
+valid_path = "E:/PycharmProjects/OpenKE/benchmarks/FB15K237/valid2id.txt"
+test_path = "E:/PycharmProjects/OpenKE/benchmarks/FB15K237/test2id.txt"
 data_path = "E:/PycharmProjects/OpenKE/FB15K237_result/TransE.json"
 
 # not final label, correct_labels should be replaced with replace_labels
@@ -48,7 +51,7 @@ print("-------------get conf finished-------------")
 处理.content文件
 '''
 if process_content:
-    print("-------------process content-------------")
+    print("-------------process content and rel-------------")
     # make entity type to dictionary
     entity_type_file = open(entity_type_path, 'r')
     entity_type = {}
@@ -78,7 +81,12 @@ if process_content:
     entity_lines = entity_file.readlines()[1:]
     type_file = open(type_output_path, 'w')
     data_file = open(data_path, 'r')
-    data = json.load(data_file)['ent_embeddings.weight']
+    rel_output_file = open(rel_output_path, 'w')
+    rel_file = open(relation_path, 'r')
+    rel_lines = rel_file.readlines()[1:]
+    data = json.load(data_file)
+    data_ent = data['ent_embeddings.weight']
+    data_rel = data['rel_embeddings.weight']
     content_file = open(content_output_path, 'w')
 
     miss_in_entity = []
@@ -88,13 +96,14 @@ if process_content:
 
     for line in entity_lines:
         entity, entityid = line.split()
+
         # if entity in bad case
         if bad_case.get(entity, None) is not None:
             # write entity id
             type_file.write(entityid)
             content_file.write(entityid)
             # write embedding data
-            cur_datas = data[line_index]
+            cur_datas = data_ent[line_index]
             for cur_data in cur_datas:
                 content_file.write('\t' + str(cur_data))
             # write labels
@@ -113,6 +122,8 @@ if process_content:
             content_file.write('\n')
             line_index += 1
             continue
+
+        # get entities labels
         if entity_type.get(entity, None) is None and entity_description.get(entity, None) is None:
             print(entity + ' doesn\'t in type or description')
             delete_entities.append(entity)
@@ -144,7 +155,7 @@ if process_content:
             continue
         type_file.write(entityid)
         content_file.write(entityid)
-        cur_datas = data[line_index]
+        cur_datas = data_ent[line_index]
         for cur_data in cur_datas:
             content_file.write('\t' + str(cur_data))
         cnt = 0
@@ -165,6 +176,17 @@ if process_content:
     data_file.close()
     content_file.close()
 
+    # processing rel
+    line_index = 0
+    for line in data_rel:
+        rel, relid = rel_lines[line_index].split()
+        rel_output_file.write(str(relid))
+        for cur_data in line:
+            rel_output_file.write('\t' + str(cur_data))
+        rel_output_file.write('\n')
+        line_index += 1
+    rel_output_file.close()
+
     print('-------------result-------------')
     print('cnt all labels ', str(len(all_labels)))
     sorted_all_label = sorted(all_labels.items(), key = lambda x: x[1], reverse = True)
@@ -184,29 +206,30 @@ if process_content:
 '''
 if process_cites:
     print("-------------process cites-------------")
-    relation_train_file = open(relation_path_train, 'r')
-    relation_valid_file = open(relation_path_valid, 'r')
-    relation_test_file = open(relation_path_test, 'r')
-    relation_output_file = open(relation_output_path, 'w')
+    train_file = open(train_path, 'r')
+    valid_file = open(valid_path, 'r')
+    test_file = open(test_path, 'r')
+    cites_output_file = open(cites_output_path, 'w')
 
-    relation_lines = relation_train_file.readlines()[1:] + relation_valid_file.readlines()[1:] + relation_test_file.readlines()[1:]
+    triple_lines = train_file.readlines()[1:] + valid_file.readlines()[1:] + test_file.readlines()[1:]
     my_dic = {}
     delete_cnt = 0
-    for line in relation_lines:
+    for line in triple_lines:
         e1, e2, r =line.split()
         if e1 in delete_entities or e2 in delete_entities:
             continue
-        if (my_dic.get(e1, None) is None or e2 not in my_dic[e1]) and (my_dic.get(e2, None) is None or e1 not in my_dic[e2]):
-            my_dic[e1] = my_dic.get(e1, []) + [e2]
-            relation_output_file.write(str(e1) + '\t' + str(e2) + '\n')
+        if (my_dic.get(str(e1) + '+' + str(e2), None) is None or r not in my_dic[str(e1) + '+' + str(e2)]) and (my_dic.get(str(e2) + '+' + str(e1), None) is None or r not in my_dic[str(e2) + '+' + str(e1)]):
+            my_dic[str(e1) + '+' + str(e2)] = my_dic.get(str(e1) + '+' + str(e2), []) + [r]
+            my_dic[str(e2) + '+' + str(e1)] = my_dic.get(str(e2) + '+' + str(e1), []) + [r]
+            cites_output_file.write(str(e1) + '\t' + str(e2) + '\t' + str(r) + '\n')
         else:
             delete_cnt += 1
-            # print(str(e2) + " is already in " + str(e1))
+            print(str(e2) + " is already in " + str(e1))
     print("{:d} entities are deleted in cites.".format(delete_cnt))
-    relation_train_file.close()
-    relation_valid_file.close()
-    relation_test_file.close()
-    relation_output_file.close()
+    train_file.close()
+    valid_file.close()
+    test_file.close()
+    cites_output_file.close()
     print("-------------process cites finished-------------")
 
 # cnt all labels  28

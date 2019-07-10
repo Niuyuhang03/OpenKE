@@ -22,6 +22,13 @@ f = open('FB15K237.cites')
 print("FB15K237.cites:")
 lines = f.readlines()
 print(len(lines))
+
+f = open('FB15K237.rel')
+print("FB15K237.rel:")
+lines = f.readlines()
+print(len(lines))
+line = lines[1]
+print(len(line.split()) - 1)
 print('\n')
 
 f = open('../WN18RR_result/WN18RR.content')
@@ -35,3 +42,10 @@ f = open('../WN18RR_result/WN18RR.cites')
 print("WN18RR.cites:")
 lines = f.readlines()
 print(len(lines))
+
+f = open('../WN18RR_result/WN18RR.rel')
+print("WN18RR.rel:")
+lines = f.readlines()
+print(len(lines))
+line = lines[1]
+print(len(line.split()) - 1)
