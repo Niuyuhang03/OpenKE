@@ -107,10 +107,8 @@ if process_cites:
     delete_cnt = 0
     for line in triple_lines:
         e1, e2, r =line.split()
-        if (my_dic.get(str(e1) + '+' + str(e2), None) is None or r not in my_dic[str(e1) + '+' + str(e2)]) and (
-                my_dic.get(str(e2) + '+' + str(e1), None) is None or r not in my_dic[str(e2) + '+' + str(e1)]):
+        if my_dic.get(str(e1) + '+' + str(e2), None) is None or r not in my_dic[str(e1) + '+' + str(e2)]:
             my_dic[str(e1) + '+' + str(e2)] = my_dic.get(str(e1) + '+' + str(e2), []) + [r]
-            my_dic[str(e2) + '+' + str(e1)] = my_dic.get(str(e2) + '+' + str(e1), []) + [r]
             cites_output_file.write(str(e1) + '\t' + str(e2) + '\t' + str(r) + '\n')
         else:
             delete_cnt += 1
