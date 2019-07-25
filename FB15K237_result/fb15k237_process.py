@@ -2,10 +2,15 @@ import itertools
 import json
 import re
 
+
 '''
 配置环境
 '''
 print("-------------get conf-------------")
+
+process_content = True
+process_cites = True
+
 # 输出文件：FB15K237.content，FB15K237.cites。
 # FB15K237.content：每行第一列为entity id，最后一列为label，其他列为embedding feature。
 # FB15K237.cites：每行第一列为entity1 id，第二列为entity2 id，表示e1和e2之间有关系r。
@@ -40,15 +45,13 @@ bad_case = {'/m/0dnqr': ['film']}
 
 replace_labels = {'capital': 'location', 'club': 'sport', 'label': 'record_label', 'actress': 'person', 'genre': 'taxonomy', 'cause': 'taxonomy', 'category': 'taxonomy', 'zone': 'location', 'sports': 'sport', 'fame': 'award', 'lists': 'list', 'parliament': 'event', 'session': 'event', 'county': 'location', 'region': 'location', 'team': 'sport', 'publisher': 'person', 'singer': 'person', 'editor': 'person', 'artist': 'person', 'broadcaster': 'person', 'producer': 'person', 'composer': 'person', 'comedian':'person', 'actor':'person', 'player': 'person', 'winner': 'person', 'area': 'location', 'state': 'location', 'writer': 'person', 'author': 'person', 'city': 'location', 'university': 'location', 'country': 'location', 'school': 'location', 'songwriter': 'person', 'province': 'location', 'guitarist': 'person', 'position': 'location', 'designer': 'person', 'cinematographer': 'person', 'character': 'person', 'meeting': 'event', 'profession': 'job'}
 
-process_content = True
-process_cites = True
 delete_entities = []
 
 print("-------------get conf finished-------------")
 
 
 '''
-处理.content文件
+处理.content和rel文件
 '''
 if process_content:
     print("-------------process content and rel-------------")
@@ -198,7 +201,7 @@ if process_content:
     print('all entities which is deleted ', delete_entities)
     print('all entities cnt which is deleted ', len(delete_entities))
     print('-------------error end-------------')
-    print("-------------process content finished")
+    print("-------------process content and rel finished")
 
 
 '''

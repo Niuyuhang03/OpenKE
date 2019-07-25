@@ -3,6 +3,15 @@ import json
 import re
 from nltk.corpus import wordnet as wn
 
+
+'''
+配置环境
+'''
+print("-------------get conf-------------")
+
+process_content = True
+process_cites = True
+
 # 输出文件：WN18RR.content，WN18RR.cites。
 # WN18RR.content：每行第一列为entity id，最后一列为label，其他列为embedding feature。
 # WN18RR.cites：每行第一列为entity1 id，第二列为entity2 id，表示e1和e2之间有关系r。
@@ -27,11 +36,13 @@ valid_path = "E:/PycharmProjects/OpenKE/benchmarks/WN18RR/valid2id.txt"
 test_path = "E:/PycharmProjects/OpenKE/benchmarks/WN18RR/test2id.txt"
 data_path = "E:/PycharmProjects/OpenKE/WN18RR_result/TransE.json"
 
-process_content = True
-process_cites = True
+print("-------------get conf finished-------------")
 
+'''
+处理.content和rel文件
+'''
 if process_content:
-
+    print("-------------process content and rel-------------")
     pos = ['n', 'v', 'a', 'r']
 
     type_file = open(type_output_path, 'w')
@@ -93,8 +104,12 @@ if process_content:
         rel_output_file.write('\n')
         line_index += 1
     rel_output_file.close()
+    print("-------------process content and rel finished")
 
 
+'''
+处理.cites文件
+'''
 if process_cites:
     print('-------------process cites-------------')
     train_file = open(train_path, 'r')
@@ -118,3 +133,4 @@ if process_cites:
     valid_file.close()
     test_file.close()
     cites_output_file.close()
+    print("-------------process cites finished-------------")
