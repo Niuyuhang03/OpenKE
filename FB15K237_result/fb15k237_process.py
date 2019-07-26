@@ -237,3 +237,22 @@ if process_cites:
 # cnt all labels  28
 # all labels cnt:  [('film', 7243), ('award', 7175), ('person', 6869), ('location', 6039), ('organization', 2970), ('subject', 2616), ('sport', 2542), ('taxonomy', 2194), ('program', 1792), ('fiction', 1061), ('company', 987), ('military', 858), ('event', 783), ('government', 763), ('list', 622), ('form', 588), ('voice', 558), ('language', 478), ('study', 397), ('job', 384), ('record_label', 333), ('computer', 310), ('party', 282), ('degree', 255), ('channel', 225), ('food', 177), ('brand', 170), ('religion', 160)]
 # all labels:  ['location', 'organization', 'government', 'subject', 'military', 'sport', 'taxonomy', 'form', 'company', 'award', 'program', 'film', 'voice', 'person', 'language', 'fiction', 'study', 'event', 'computer', 'degree', 'list', 'job', 'religion', 'brand', 'food', 'party', 'channel', 'record_label']
+
+f = open('FB15K237.content')
+print("FB15K237.content:")
+lines = f.readlines()
+print(len(lines))
+line = lines[1]
+print(len(line.split()) - 2)
+
+f = open('FB15K237.cites')
+print("FB15K237.cites:")
+lines = f.readlines()
+print(len(lines))
+
+f = open('FB15K237.rel')
+print("FB15K237.rel:")
+lines = f.readlines()
+print(len(lines))
+line = lines[1]
+print(len(line.split()) - 1)
