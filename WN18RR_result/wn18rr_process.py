@@ -11,6 +11,7 @@ print("-------------get conf-------------")
 
 process_content = True
 process_cites = True
+max_entities_num = 1000000
 
 # 输出文件：WN18RR.content，WN18RR.cites。
 # WN18RR.content：每行第一列为entity id，最后一列为label，其他列为embedding feature。
@@ -36,6 +37,8 @@ valid_path = "E:/PycharmProjects/OpenKE/benchmarks/WN18RR/valid2id.txt"
 test_path = "E:/PycharmProjects/OpenKE/benchmarks/WN18RR/test2id.txt"
 data_path = "E:/PycharmProjects/OpenKE/WN18RR_result/TransE.json"
 
+delete_entities = []
+
 print("-------------get conf finished-------------")
 
 '''
@@ -58,36 +61,38 @@ if process_content:
     content_file = open(content_output_path, 'w')
     line_index = 0
 
-    print('-------------process content and rel-------------')
     for line in entity_lines:
         entity, entityid = line.split()
         entity = int(entity)
-        type_file.write(entityid)
-        content_file.write(entityid)
-        labels = []
-        for cur_pos in pos:
-            try:
-                wn.synset_from_pos_and_offset(cur_pos, entity)
-                labels.append(cur_pos)
-            except:
-                pass
-        if len(labels) == 0:
-            print(entity + ' has no pos in synset\n')
+        if line_index < max_entities_num:
+            type_file.write(entityid)
+            content_file.write(entityid)
+            labels = []
+            for cur_pos in pos:
+                try:
+                    wn.synset_from_pos_and_offset(cur_pos, entity)
+                    labels.append(cur_pos)
+                except:
+                    pass
+            if len(labels) == 0:
+                print(entity + ' has no pos in synset\n')
+            else:
+                cur_datas = data_ent[line_index]
+                for cur_data in cur_datas:
+                    content_file.write('\t' + str(cur_data))
+                cnt = 0
+                for label in labels:
+                    if cnt == 0:
+                        cnt = 1
+                        type_file.write('\t' + label)
+                        content_file.write('\t' + label)
+                    else:
+                        type_file.write(',' + label)
+                        content_file.write(',' + label)
+            type_file.write('\n')
+            content_file.write('\n')
         else:
-            cur_datas = data_ent[line_index]
-            for cur_data in cur_datas:
-                content_file.write('\t' + str(cur_data))
-            cnt = 0
-            for label in labels:
-                if cnt == 0:
-                    cnt = 1
-                    type_file.write('\t' + label)
-                    content_file.write('\t' + label)
-                else:
-                    type_file.write(',' + label)
-                    content_file.write(',' + label)
-        type_file.write('\n')
-        content_file.write('\n')
+            delete_entities.append(entityid)
         line_index += 1
     type_file.close()
     entity_file.close()
@@ -122,6 +127,8 @@ if process_cites:
     delete_cnt = 0
     for line in triple_lines:
         e1, e2, r =line.split()
+        if e1 in delete_entities or e2 in delete_entities:
+            continue
         if my_dic.get(str(e1) + '+' + str(e2), None) is None or r not in my_dic[str(e1) + '+' + str(e2)]:
             my_dic[str(e1) + '+' + str(e2)] = my_dic.get(str(e1) + '+' + str(e2), []) + [r]
             cites_output_file.write(str(e1) + '\t' + str(e2) + '\t' + str(r) + '\n')
@@ -134,3 +141,22 @@ if process_cites:
     test_file.close()
     cites_output_file.close()
     print("-------------process cites finished-------------")
+
+f = open('../WN18RR_result/WN18RR.content')
+print("WN18RR.content:")
+lines = f.readlines()
+print(len(lines))
+line = lines[1]
+print(len(line.split()) - 2)
+
+f = open('../WN18RR_result/WN18RR.cites')
+print("WN18RR.cites:")
+lines = f.readlines()
+print(len(lines))
+
+f = open('../WN18RR_result/WN18RR.rel')
+print("WN18RR.rel:")
+lines = f.readlines()
+print(len(lines))
+line = lines[1]
+print(len(line.split()) - 1)
