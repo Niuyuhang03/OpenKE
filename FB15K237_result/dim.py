@@ -49,3 +49,23 @@ lines = f.readlines()
 print(len(lines))
 line = lines[1]
 print(len(line.split()) - 1)
+print('\n')
+
+f = open('../WN18RR_result/WN18RR_sub30000.content')
+print("WN18RR_sub30000.content:")
+lines = f.readlines()
+print(len(lines))
+line = lines[1]
+print(len(line.split()) - 2)
+
+f = open('../WN18RR_result/WN18RR_sub30000.cites')
+print("WN18RR_sub30000.cites:")
+lines = f.readlines()
+print(len(lines))
+
+f = open('../WN18RR_result/WN18RR_sub30000.rel')
+print("WN18RR_sub30000.rel:")
+lines = f.readlines()
+print(len(lines))
+line = lines[1]
+print(len(line.split()) - 1)
