@@ -234,9 +234,10 @@ if process_cites:
     cites_output_file.close()
     print("-------------process cites finished-------------")
 
-# cnt all labels  28
-# all labels cnt:  [('film', 7243), ('award', 7175), ('person', 6869), ('location', 6039), ('organization', 2970), ('subject', 2616), ('sport', 2542), ('taxonomy', 2194), ('program', 1792), ('fiction', 1061), ('company', 987), ('military', 858), ('event', 783), ('government', 763), ('list', 622), ('form', 588), ('voice', 558), ('language', 478), ('study', 397), ('job', 384), ('record_label', 333), ('computer', 310), ('party', 282), ('degree', 255), ('channel', 225), ('food', 177), ('brand', 170), ('religion', 160)]
-# all labels:  ['location', 'organization', 'government', 'subject', 'military', 'sport', 'taxonomy', 'form', 'company', 'award', 'program', 'film', 'voice', 'person', 'language', 'fiction', 'study', 'event', 'computer', 'degree', 'list', 'job', 'religion', 'brand', 'food', 'party', 'channel', 'record_label']
+# cnt all labels  25
+# all labels cnt:  [('film', 7243), ('award', 7175), ('person', 7029), ('location', 6039), ('organization', 2970), ('study', 2940), ('sport', 2542), ('taxonomy', 2194), ('program', 1792), ('fiction', 1061), ('company', 987), ('military', 858), ('event', 783), ('government', 763), ('list', 622), ('voice', 558), ('language', 478), ('job', 384), ('record_label', 333), ('computer', 310), ('party', 282), ('channel', 225), ('food', 177), ('brand', 170), ('religion', 160)]
+# all labels:  ['taxonomy', 'study', 'location', 'organization', 'government', 'sport', 'military', 'program', 'award', 'company', 'film', 'voice', 'person', 'language', 'fiction', 'event', 'computer', 'list', 'job', 'religion', 'brand', 'food', 'party', 'channel', 'record_label']
+
 
 f = open('FB15K237.content')
 print("FB15K237.content:")
