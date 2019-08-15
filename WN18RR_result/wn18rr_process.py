@@ -1,5 +1,6 @@
 import itertools
 import json
+import random
 import re
 from nltk.corpus import wordnet as wn
 
@@ -11,15 +12,18 @@ print("-------------get conf-------------")
 
 process_content = True
 process_cites = True
-max_entities_num = 1000000
+entity_file = open("E:/PycharmProjects/OpenKE/benchmarks/WN18RR/entity2id.txt", 'r')
+entity_num = len(entity_file.readlines())
+# chosen_entity_list = random.sample(range(entity_num - 1), 20000)
+chosen_entity_list = range(len(entity_file.readlines()))
 
 # 输出文件：WN18RR.content，WN18RR.cites。
 # WN18RR.content：每行第一列为entity id，最后一列为label，其他列为embedding feature。
 # WN18RR.cites：每行第一列为entity1 id，第二列为entity2 id，表示e1和e2之间有关系r。
 # WN18RR.rel：对rel进行embedding的结果。
-content_output_path = "E:/PycharmProjects/OpenKE/WN18RR_result/WN18RR.content"
-cites_output_path = "E:/PycharmProjects/OpenKE/WN18RR_result/WN18RR.cites"
-rel_output_path = "E:/PycharmProjects/OpenKE/WN18RR_result/WN18RR.rel"
+content_output_path = "E:/PycharmProjects/OpenKE/WN18RR_result/WN18RR_sub20000.content"
+cites_output_path = "E:/PycharmProjects/OpenKE/WN18RR_result/WN18RR_sub20000.cites"
+rel_output_path = "E:/PycharmProjects/OpenKE/WN18RR_result/WN18RR_sub20000.rel"
 
 # 中间文件：WN18RR.type。
 # WN18RR.type，每行第一列为entity id，第二列为label。
@@ -63,14 +67,13 @@ if process_content:
 
     for line in entity_lines:
         entity, entityid = line.split()
-        entity = int(entity)
-        if line_index < max_entities_num:
-            type_file.write(str(entity) + '\t' + entityid)
-            content_file.write(str(entity) + '\t' + entityid)
+        if line_index in chosen_entity_list:
+            type_file.write(entity + '\t' + entityid)
+            content_file.write(entity + '\t' + entityid)
             labels = []
             for cur_pos in pos:
                 try:
-                    wn.synset_from_pos_and_offset(cur_pos, entity)
+                    wn.synset_from_pos_and_offset(cur_pos, int(entity))
                     labels.append(cur_pos)
                 except:
                     pass
