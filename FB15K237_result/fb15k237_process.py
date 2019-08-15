@@ -103,8 +103,8 @@ if process_content:
         # if entity in bad case
         if bad_case.get(entity, None) is not None:
             # write entity id
-            type_file.write(entityid)
-            content_file.write(entityid)
+            type_file.write(entity + '\t' + entityid)
+            content_file.write(entity + '\t' + entityid)
             # write embedding data
             cur_datas = data_ent[line_index]
             for cur_data in cur_datas:
@@ -156,8 +156,8 @@ if process_content:
             delete_entities.append(entityid)
             line_index += 1
             continue
-        type_file.write(entityid)
-        content_file.write(entityid)
+        type_file.write(entity + '\t' + entityid)
+        content_file.write(entity + '\t' + entityid)
         cur_datas = data_ent[line_index]
         for cur_data in cur_datas:
             content_file.write('\t' + str(cur_data))
@@ -183,7 +183,7 @@ if process_content:
     line_index = 0
     for line in data_rel:
         rel, relid = rel_lines[line_index].split()
-        rel_output_file.write(str(relid))
+        rel_output_file.write(rel + '\t' + relid)
         for cur_data in line:
             rel_output_file.write('\t' + str(cur_data))
         rel_output_file.write('\n')
@@ -244,7 +244,7 @@ print("FB15K237.content:")
 lines = f.readlines()
 print(len(lines))
 line = lines[1]
-print(len(line.split()) - 2)
+print(len(line.split()) - 3)
 
 f = open('FB15K237.cites')
 print("FB15K237.cites:")
@@ -256,4 +256,4 @@ print("FB15K237.rel:")
 lines = f.readlines()
 print(len(lines))
 line = lines[1]
-print(len(line.split()) - 1)
+print(len(line.split()) - 2)

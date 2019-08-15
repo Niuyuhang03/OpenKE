@@ -65,8 +65,8 @@ if process_content:
         entity, entityid = line.split()
         entity = int(entity)
         if line_index < max_entities_num:
-            type_file.write(entityid)
-            content_file.write(entityid)
+            type_file.write(str(entity) + '\t' + entityid)
+            content_file.write(str(entity) + '\t' + entityid)
             labels = []
             for cur_pos in pos:
                 try:
@@ -103,7 +103,7 @@ if process_content:
     line_index = 0
     for line in data_rel:
         rel, relid = rel_lines[line_index].split()
-        rel_output_file.write(str(relid))
+        rel_output_file.write(rel + '\t' + relid)
         for cur_data in line:
             rel_output_file.write('\t' + str(cur_data))
         rel_output_file.write('\n')
@@ -147,7 +147,7 @@ print("WN18RR.content:")
 lines = f.readlines()
 print(len(lines))
 line = lines[1]
-print(len(line.split()) - 2)
+print(len(line.split()) - 3)
 
 f = open('../WN18RR_result/WN18RR.cites')
 print("WN18RR.cites:")
@@ -159,4 +159,4 @@ print("WN18RR.rel:")
 lines = f.readlines()
 print(len(lines))
 line = lines[1]
-print(len(line.split()) - 1)
+print(len(line.split()) - 2)
