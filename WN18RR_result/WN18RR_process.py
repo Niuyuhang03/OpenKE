@@ -182,5 +182,5 @@ for a, b in zip(x, y):
 plt.xticks(x,name,size='small',rotation=30)
 plt.xlabel("labels")
 plt.ylabel("count")
-plt.title('WN18RR, entities number {}'.format(len(labels)))
+plt.title('WN18RR, entities number {}'.format(len(entity_lines) - len(delete_entities)))
 plt.show()

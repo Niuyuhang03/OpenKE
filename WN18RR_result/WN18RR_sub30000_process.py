@@ -78,6 +78,7 @@ for line in entity_lines:
     else:
         if labels[line_index] == ['n'] and len(delete_entities) < delete_num:
             delete_entities.append(entityid)
+            labels[line_index] = []
             line_index += 1
             continue
         labels_plot[' '.join(labels[line_index])] = labels_plot.get(' '.join(labels[line_index]), 0) + 1
@@ -184,5 +185,5 @@ for a, b in zip(x, y):
 plt.xticks(x,name,size='small',rotation=30)
 plt.xlabel("labels")
 plt.ylabel("count")
-plt.title('WN18RR_sub30000, entities number {}'.format(len(labels)))
+plt.title('WN18RR_sub30000, entities number {}'.format(len(entity_lines) - len(delete_entities)))
 plt.show()
