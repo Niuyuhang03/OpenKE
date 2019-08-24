@@ -1,4 +1,5 @@
 import json
+import random
 from nltk.corpus import wordnet as wn
 from matplotlib import pyplot as plt
 
@@ -7,8 +8,12 @@ from matplotlib import pyplot as plt
 配置环境
 '''
 print("-------------get conf-------------")
-# 生成（总数-delete_num）个实体，即删除delete_num个label为n的实体
-delete_num = 10000
+# 删除10000个随机实体
+entity_file = open("../benchmarks/WN18RR/entity2id.txt", 'r')
+entity_num = len(entity_file.readlines())
+chosen_entity_list = random.sample(range(entity_num - 1), 10000)
+# chosen_entity_list = range(entity_num)
+entity_file.close()
 
 # 输入文件：entity2id.txt，relation2id.txt，train2id.txt，valid2id.txt，test2id.txt，TransE.json。
 # entity2id.txt：实体名称和实体id的对应关系，由OpenKE得到。
@@ -62,6 +67,13 @@ labels = []
 labels_plot = {}
 for line in entity_lines:
     entity, entityid = line.split()
+
+    if line_index in chosen_entity_list:
+        delete_entities.append(entityid)
+        labels.append([])
+        line_index += 1
+        continue
+
     # 得到实体所有label
     labels.append([])
     for cur_pos in pos:
@@ -76,11 +88,6 @@ for line in entity_lines:
         print(entity + ' has no pos in synset\n')
         delete_entities.append(entityid)
     else:
-        if labels[line_index] == ['n'] and len(delete_entities) < delete_num:
-            delete_entities.append(entityid)
-            labels[line_index] = []
-            line_index += 1
-            continue
         labels_plot[' '.join(labels[line_index])] = labels_plot.get(' '.join(labels[line_index]), 0) + 1
         # 写入实体名称和id
         type_output_file.write(entity + '\t' + entityid)

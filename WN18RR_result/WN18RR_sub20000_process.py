@@ -1,4 +1,5 @@
 import json
+import random
 from nltk.corpus import wordnet as wn
 from matplotlib import pyplot as plt
 
@@ -7,8 +8,12 @@ from matplotlib import pyplot as plt
 配置环境
 '''
 print("-------------get conf-------------")
-# 生成（总数-delete_num）个实体，即删除delete_num个label为n的实体
-delete_num = 20000
+# 删除10000个随机实体
+entity_file = open("../benchmarks/WN18RR/entity2id.txt", 'r')
+entity_num = len(entity_file.readlines())
+chosen_entity_list = random.sample(range(entity_num - 1), 20000)
+# chosen_entity_list = range(entity_num)
+entity_file.close()
 
 # 输入文件：entity2id.txt，relation2id.txt，train2id.txt，valid2id.txt，test2id.txt，TransE.json。
 # entity2id.txt：实体名称和实体id的对应关系，由OpenKE得到。
@@ -27,10 +32,10 @@ data_path = "TransE.json"
 # WN18RR.cites：每行第1列为实体1 id，第2列为实体2id，第3列为实体1和实体2的关系。
 # WN18RR.rel：每行第1列为关系id，后100列为embeddings。
 # WN18RR.type，每行第1列为实体id，第二列为其label。label有多个时以逗号分隔。
-content_output_path = "WN18RR_sub30000.content"
-cites_output_path = "WN18RR_sub30000.cites"
-rel_output_path = "WN18RR_sub30000.rel"
-type_output_path = "WN18RR_sub30000.type"
+content_output_path = "WN18RR_sub20000.content"
+cites_output_path = "WN18RR_sub20000.cites"
+rel_output_path = "WN18RR_sub20000.rel"
+type_output_path = "WN18RR_sub20000.type"
 
 print("-------------get conf finished-------------")
 
@@ -62,6 +67,13 @@ labels = []
 labels_plot = {}
 for line in entity_lines:
     entity, entityid = line.split()
+
+    if line_index in chosen_entity_list:
+        delete_entities.append(entityid)
+        labels.append([])
+        line_index += 1
+        continue
+
     # 得到实体所有label
     labels.append([])
     for cur_pos in pos:
@@ -76,10 +88,6 @@ for line in entity_lines:
         print(entity + ' has no pos in synset\n')
         delete_entities.append(entityid)
     else:
-        if labels[line_index] == ['n'] and len(delete_entities) < delete_num:
-            delete_entities.append(entityid)
-            line_index += 1
-            continue
         labels_plot[' '.join(labels[line_index])] = labels_plot.get(' '.join(labels[line_index]), 0) + 1
         # 写入实体名称和id
         type_output_file.write(entity + '\t' + entityid)
@@ -152,20 +160,20 @@ cites_output_file.close()
 print("-------------process cites finished-------------")
 
 print('-------------statistics-------------')
-f = open('WN18RR_sub30000.content')
-print("WN18RR_sub30000.content:")
+f = open('WN18RR_sub20000.content')
+print("WN18RR_sub20000.content:")
 lines = f.readlines()
 print(len(lines))
 line = lines[1]
 print(len(line.split()) - 3)
 
-f = open('WN18RR_sub30000.cites')
-print("WN18RR_sub30000.cites:")
+f = open('WN18RR_sub20000.cites')
+print("WN18RR_sub20000.cites:")
 lines = f.readlines()
 print(len(lines))
 
-f = open('WN18RR_sub30000.rel')
-print("WN18RR_sub30000.rel:")
+f = open('WN18RR_sub20000.rel')
+print("WN18RR_sub20000.rel:")
 lines = f.readlines()
 print(len(lines))
 line = lines[1]
@@ -184,5 +192,5 @@ for a, b in zip(x, y):
 plt.xticks(x,name,size='small',rotation=30)
 plt.xlabel("labels")
 plt.ylabel("count")
-plt.title('WN18RR_sub30000, entities number {}'.format(len(entity_lines) - len(delete_entities)))
+plt.title('WN18RR_sub20000, entities number {}'.format(len(entity_lines) - len(delete_entities)))
 plt.show()

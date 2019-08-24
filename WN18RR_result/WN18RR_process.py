@@ -7,8 +7,6 @@ from matplotlib import pyplot as plt
 配置环境
 '''
 print("-------------get conf-------------")
-# 生成（总数-delete_num）个实体，即删除delete_num个label为n的实体
-delete_num = 0
 
 # 输入文件：entity2id.txt，relation2id.txt，train2id.txt，valid2id.txt，test2id.txt，TransE.json。
 # entity2id.txt：实体名称和实体id的对应关系，由OpenKE得到。
@@ -74,10 +72,6 @@ for line in entity_lines:
     if len(labels[line_index]) == 0:
         delete_entities.append(entityid)
     else:
-        if labels[line_index] == ['n'] and len(delete_entities) < delete_num:
-            delete_entities.append(entityid)
-            line_index += 1
-            continue
         labels_plot[' '.join(labels[line_index])] = labels_plot.get(' '.join(labels[line_index]), 0) + 1
         # 写入实体名称和id
         type_output_file.write(entity + '\t' + entityid)
