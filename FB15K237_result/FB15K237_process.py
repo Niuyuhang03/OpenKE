@@ -24,15 +24,17 @@ data_path = "TransE.json"
 entity_description_path = "../benchmarks/FB15K237/FB15k_mid2description.txt"
 entity_type_path = "../benchmarks/FB15K237/entity2type.txt"
 
-# 输出文件：FB15K237.content，FB15K237.cites，FB15K237.rel，FB15K237.type。
+# 输出文件：FB15K237.content，FB15K237.cites，FB15K237.rel，FB15K237.type，delete_entities.txt。
 # FB15K237.content：每行第1列为实体id，最后1列为label，其他列为embeddings。label有多个时以逗号分隔。
 # FB15K237.cites：每行第1列为实体1 id，第2列为实体2id，第3列为实体1和实体2的关系。
 # FB15K237.rel：每行第1列为关系id，后100列为embeddings。
-# FB15K237.type，每行第1列为实体id，第二列为其label。label有多个时以逗号分隔。
+# FB15K237.type：每行第1列为实体id，第二列为其label。label有多个时以逗号分隔。
+# delete_entities.txt：难以被归类到实体。
 content_output_path = "FB15K237.content"
 cites_output_path = "FB15K237.cites"
 rel_output_path = "FB15K237.rel"
 type_output_path = "FB15K237.type"
+delete_entities_path = "delete_entities.txt"
 
 # 初始labels，需要经过替换labels处理后得到最终labels
 correct_labels = ['film', 'actor', 'producer', 'director', 'county', 'university', 'writer', 'city', 'team', 'composer', 'award', 'region', 'capital', 'comedian', 'author', 'genre', 'country', 'state', 'label', 'songwriter', 'artist', 'company', 'province', 'cinematographer', 'language', 'designer', 'guitarist', 'meeting', 'area', 'zone', 'fiction', 'party', 'singer', 'event', 'school', 'player', 'publisher', 'voice', 'editor', 'club', 'actress', 'winner', 'government', 'character', 'channel', 'taxonomy', 'program', 'sport', 'location', 'brand', 'organization', 'religion', 'computer', 'job', 'subject', 'profession', 'position', 'sports', 'cause', 'fame', 'list', 'lists', 'parliament', 'military', 'degree', 'study', 'session', 'category', 'food', 'broadcaster']
@@ -48,6 +50,7 @@ print("-------------get conf finished-------------")
 处理.content和rel文件
 '''
 print("-------------process content and rel-------------")
+delete_entities_id = []
 delete_entities = []
 
 # 构造实体和对应DKRL初步分类的字典
@@ -120,6 +123,7 @@ for line in entity_lines:
 
     # 处理其他实体
     if entity_type.get(entity, None) is None and entity_description.get(entity, None) is None:
+        delete_entities_id.append(entityid)
         delete_entities.append(entity)
     labels = []
     if entity in entity_description:
@@ -140,7 +144,8 @@ for line in entity_lines:
                     labels.append(type.lower())
 
     if len(labels) == 0:
-        delete_entities.append(entityid)
+        delete_entities_id.append(entityid)
+        delete_entities.append(entity)
         line_index += 1
         continue
 
@@ -197,7 +202,7 @@ my_dic = {}
 delete_cnt = 0
 for line in triple_lines:
     e1, e2, r =line.split()
-    if e1 in delete_entities or e2 in delete_entities:
+    if e1 in delete_entities_id or e2 in delete_entities_id:
         continue
     if my_dic.get(str(e1) + '+' + str(e2), None) is None or r not in my_dic[str(e1) + '+' + str(e2)]:
         my_dic[str(e1) + '+' + str(e2)] = my_dic.get(str(e1) + '+' + str(e2), []) + [r]
@@ -206,6 +211,9 @@ train_file.close()
 valid_file.close()
 test_file.close()
 cites_output_file.close()
+# with open(delete_entities_path, 'w') as f:
+#     for ent in delete_entities:
+#         f.write(ent + " ")
 print("-------------process cites finished-------------")
 
 # cnt all labels  25
