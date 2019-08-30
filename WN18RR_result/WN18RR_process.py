@@ -74,6 +74,7 @@ for line in entity_lines:
             pass
 
     if len(labels[line_index]) == 0:
+        print(entity + ' has no pos in synset\n')
         delete_entities_id.append(entityid)
         delete_entities.append(entity)
     else:

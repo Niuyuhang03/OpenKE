@@ -147,8 +147,7 @@ for line in entity_lines:
     if len(labels) == 0:
         delete_entities_id.append(entityid)
         delete_entities.append(entity)
-        line_index += 1
-        continue
+        labels.append('location')
 
     # 写入实体名称和id
     type_output_file.write(entity + '\t' + entityid)
@@ -203,8 +202,6 @@ my_dic = {}
 delete_cnt = 0
 for line in triple_lines:
     e1, e2, r =line.split()
-    if e1 in delete_entities_id or e2 in delete_entities_id:
-        continue
     if my_dic.get(str(e1) + '+' + str(e2), None) is None or r not in my_dic[str(e1) + '+' + str(e2)]:
         my_dic[str(e1) + '+' + str(e2)] = my_dic.get(str(e1) + '+' + str(e2), []) + [r]
         cites_output_file.write(str(e1) + '\t' + str(e2) + '\t' + str(r) + '\n')
@@ -216,7 +213,7 @@ cites_output_file.close()
 if delete_entities:
     with open(delete_entities_path, 'w') as f:
         for ent in delete_entities:
-            f.write(ent)
+            f.write(ent + '\n')
 elif os.exists(delete_entities_path):
     os.remove(delete_entities_path)
 print("-------------process cites finished-------------")
@@ -263,5 +260,5 @@ for a, b in zip(x, y):
 plt.xticks(x,name,fontsize=6,rotation=60)
 plt.xlabel("labels")
 plt.ylabel("count")
-plt.title('FB15K237, entities number {}'.format(len(entity_lines) - len(delete_entities)))
+plt.title('FB15K237, entities number {}'.format(len(entity_lines)))
 plt.show()
