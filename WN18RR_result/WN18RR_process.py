@@ -1,3 +1,4 @@
+import os
 import json
 from nltk.corpus import wordnet as wn
 from matplotlib import pyplot as plt
@@ -146,9 +147,12 @@ valid_file.close()
 test_file.close()
 cites_output_file.close()
 
-with open(delete_entities_path, 'w') as f:
-    for ent in delete_entities:
-        f.write(ent)
+if delete_entities:
+    with open(delete_entities_path, 'w') as f:
+        for ent in delete_entities:
+            f.write(ent)
+elif os.exists(delete_entities_path):
+    os.remove(delete_entities_path)
 print("-------------process cites finished-------------")
 
 print('-------------statistics-------------')
