@@ -20,15 +20,17 @@ valid_path = "../benchmarks/WN18RR/valid2id.txt"
 test_path = "../benchmarks/WN18RR/test2id.txt"
 data_path = "TransE.json"
 
-# 输出文件：WN18RR.content，WN18RR.cites，WN18RR.rel，WN18RR.type
+# 输出文件：WN18RR.content，WN18RR.cites，WN18RR.rel，WN18RR.type，WN18RR.dele
 # WN18RR.content：每行第1列为实体id，最后1列为label，其他列为embeddings。label有多个时以逗号分隔。
 # WN18RR.cites：每行第1列为实体1 id，第2列为实体2id，第3列为实体1和实体2的关系。
 # WN18RR.rel：每行第1列为关系id，后100列为embeddings。
 # WN18RR.type，每行第1列为实体id，第二列为其label。label有多个时以逗号分隔。
+# WN18RR.dele：难以被归类到实体。
 content_output_path = "WN18RR.content"
 cites_output_path = "WN18RR.cites"
 rel_output_path = "WN18RR.rel"
 type_output_path = "WN18RR.type"
+delete_entities_path = "WN18RR.dele"
 
 print("-------------get conf finished-------------")
 
@@ -36,6 +38,7 @@ print("-------------get conf finished-------------")
 处理.content和rel文件
 '''
 delete_entities = []
+delete_entities_id = []
 print("-------------process content and rel-------------")
 # WN18RR中所有labels
 pos = ['n', 'v', 'a', 'r']
@@ -70,7 +73,8 @@ for line in entity_lines:
             pass
 
     if len(labels[line_index]) == 0:
-        delete_entities.append(entityid)
+        delete_entities_id.append(entityid)
+        delete_entities.append(entity)
     else:
         labels_plot[' '.join(labels[line_index])] = labels_plot.get(' '.join(labels[line_index]), 0) + 1
         # 写入实体名称和id
@@ -132,7 +136,7 @@ triple_lines = train_file.readlines()[1:] + valid_file.readlines()[1:] + test_fi
 my_dic = {}
 for line in triple_lines:
     e1, e2, r =line.split()
-    if e1 in delete_entities or e2 in delete_entities:
+    if e1 in delete_entities_id or e2 in delete_entities_id:
         continue
     if my_dic.get(str(e1) + '+' + str(e2), None) is None or r not in my_dic[str(e1) + '+' + str(e2)]:
         my_dic[str(e1) + '+' + str(e2)] = my_dic.get(str(e1) + '+' + str(e2), []) + [r]
@@ -141,6 +145,10 @@ train_file.close()
 valid_file.close()
 test_file.close()
 cites_output_file.close()
+
+with open(delete_entities_path, 'w') as f:
+    for ent in delete_entities:
+        f.write(ent)
 print("-------------process cites finished-------------")
 
 print('-------------statistics-------------')
