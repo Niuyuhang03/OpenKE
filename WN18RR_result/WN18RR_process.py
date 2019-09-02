@@ -152,7 +152,7 @@ if delete_entities:
     with open(delete_entities_path, 'w') as f:
         for ent in delete_entities:
             f.write(ent)
-elif os.exists(delete_entities_path):
+elif os.path.exists(delete_entities_path):
     os.remove(delete_entities_path)
 print("-------------process cites finished-------------")
 

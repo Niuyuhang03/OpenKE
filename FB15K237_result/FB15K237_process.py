@@ -123,31 +123,32 @@ for line in entity_lines:
         continue
 
     # 处理其他实体
+    labels = []
     if entity_type.get(entity, None) is None and entity_description.get(entity, None) is None:
         delete_entities_id.append(entityid)
         delete_entities.append(entity)
-    labels = []
-    if entity in entity_description:
-        descriptions = entity_description[entity]
-        for description in descriptions:
-            if description.lower() in correct_labels:
-                if description.lower() in replace_labels:
-                    labels.append(replace_labels[description.lower()])
-                else:
-                    labels.append(description.lower())
-    if entity in entity_type:
-        types = entity_type[entity]
-        for type in types:
-            if type.lower() in correct_labels:
-                if type.lower() in replace_labels:
-                    labels.append(replace_labels[type.lower()])
-                else:
-                    labels.append(type.lower())
-
-    if len(labels) == 0:
-        delete_entities_id.append(entityid)
-        delete_entities.append(entity)
         labels.append('location')
+    else:
+        if entity in entity_description:
+            descriptions = entity_description[entity]
+            for description in descriptions:
+                if description.lower() in correct_labels:
+                    if description.lower() in replace_labels:
+                        labels.append(replace_labels[description.lower()])
+                    else:
+                        labels.append(description.lower())
+        if entity in entity_type:
+            types = entity_type[entity]
+            for type in types:
+                if type.lower() in correct_labels:
+                    if type.lower() in replace_labels:
+                        labels.append(replace_labels[type.lower()])
+                    else:
+                        labels.append(type.lower())
+        if len(labels) == 0:
+            delete_entities_id.append(entityid)
+            delete_entities.append(entity)
+            labels.append('location')
 
     # 写入实体名称和id
     type_output_file.write(entity + '\t' + entityid)
@@ -159,7 +160,8 @@ for line in entity_lines:
     # 写入实体labels
     cnt = 0
     for label in set(labels):
-        all_labels[label] = all_labels.get(label, 0) + 1
+        if entity not in delete_entities:
+            all_labels[label] = all_labels.get(label, 0) + 1
         if cnt == 0:
             cnt = 1
             type_output_file.write('\t' + label.replace('\'', ''))
@@ -214,7 +216,7 @@ if delete_entities:
     with open(delete_entities_path, 'w') as f:
         for ent in delete_entities:
             f.write(ent + '\n')
-elif os.exists(delete_entities_path):
+elif os.path.exists(delete_entities_path):
     os.remove(delete_entities_path)
 print("-------------process cites finished-------------")
 
@@ -260,5 +262,18 @@ for a, b in zip(x, y):
 plt.xticks(x,name,fontsize=6,rotation=60)
 plt.xlabel("labels")
 plt.ylabel("count")
-plt.title('FB15K237, entities number {}'.format(len(entity_lines)))
+plt.title('FB15K237(except {} deleted entities), entities number {}'.format(len(delete_entities), len(entity_lines) - len(delete_entities)))
 plt.show()
+'''
+all labels: 25
+all labels cnt:  [('film', 7243), ('award', 7175), ('person', 7029), ('location', 6039), ('organization', 2970), ('study', 2940), ('sport', 2542), ('taxonomy', 2194), ('program', 1792), ('fiction', 1061), ('company', 987), ('military', 858), ('event', 783), ('government', 763), ('list', 622), ('voice', 558), ('language', 478), ('job', 384), ('record_label', 333), ('computer', 310), ('party', 282), ('channel', 225), ('food', 177), ('brand', 170), ('religion', 160)]
+all labels:  ['taxonomy', 'government', 'military', 'study', 'organization', 'location', 'sport', 'company', 'program', 'award', 'film', 'voice', 'person', 'language', 'fiction', 'event', 'computer', 'list', 'job', 'religion', 'brand', 'food', 'party', 'channel', 'record_label']
+FB15K237.content:
+14541
+100
+FB15K237.cites:
+310116
+FB15K237.rel:
+237
+100
+'''
