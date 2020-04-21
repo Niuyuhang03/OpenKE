@@ -127,7 +127,7 @@ for line in entity_lines:
     if entity_type.get(entity, None) is None and entity_description.get(entity, None) is None:
         delete_entities_id.append(entityid)
         delete_entities.append(entity)
-        labels.append('location')
+        labels.append('film')
     else:
         if entity in entity_description:
             descriptions = entity_description[entity]
@@ -148,7 +148,7 @@ for line in entity_lines:
         if len(labels) == 0:
             delete_entities_id.append(entityid)
             delete_entities.append(entity)
-            labels.append('location')
+            labels.append('film')
 
     # 写入实体名称和id
     type_output_file.write(entity + '\t' + entityid)
@@ -160,8 +160,7 @@ for line in entity_lines:
     # 写入实体labels
     cnt = 0
     for label in set(labels):
-        if entity not in delete_entities:
-            all_labels[label] = all_labels.get(label, 0) + 1
+        all_labels[label] = all_labels.get(label, 0) + 1
         if cnt == 0:
             cnt = 1
             type_output_file.write('\t' + label.replace('\'', ''))
@@ -201,7 +200,6 @@ cites_output_file = open(cites_output_path, 'w')
 
 triple_lines = train_file.readlines()[1:] + valid_file.readlines()[1:] + test_file.readlines()[1:]
 my_dic = {}
-delete_cnt = 0
 for line in triple_lines:
     e1, e2, r =line.split()
     if my_dic.get(str(e1) + '+' + str(e2), None) is None or r not in my_dic[str(e1) + '+' + str(e2)]:
@@ -219,10 +217,6 @@ if delete_entities:
 elif os.path.exists(delete_entities_path):
     os.remove(delete_entities_path)
 print("-------------process cites finished-------------")
-
-# cnt all labels  25
-# all labels cnt:  [('film', 7243), ('award', 7175), ('person', 7029), ('location', 6039), ('organization', 2970), ('study', 2940), ('sport', 2542), ('taxonomy', 2194), ('program', 1792), ('fiction', 1061), ('company', 987), ('military', 858), ('event', 783), ('government', 763), ('list', 622), ('voice', 558), ('language', 478), ('job', 384), ('record_label', 333), ('computer', 310), ('party', 282), ('channel', 225), ('food', 177), ('brand', 170), ('religion', 160)]
-# all labels:  ['taxonomy', 'study', 'location', 'organization', 'government', 'sport', 'military', 'program', 'award', 'company', 'film', 'voice', 'person', 'language', 'fiction', 'event', 'computer', 'list', 'job', 'religion', 'brand', 'food', 'party', 'channel', 'record_label']
 
 print('-------------statistics-------------')
 print("all labels: {}".format(len(all_labels)))
@@ -262,12 +256,12 @@ for a, b in zip(x, y):
 plt.xticks(x,name,fontsize=6,rotation=60)
 plt.xlabel("labels")
 plt.ylabel("count")
-plt.title('FB15K237(except {} deleted entities), entities number {}'.format(len(delete_entities), len(entity_lines) - len(delete_entities)))
+plt.title('FB15K237, entities number {}'.format(len(entity_lines)))
 plt.show()
 '''
 all labels: 25
-all labels cnt:  [('film', 7243), ('award', 7175), ('person', 7029), ('location', 6039), ('organization', 2970), ('study', 2940), ('sport', 2542), ('taxonomy', 2194), ('program', 1792), ('fiction', 1061), ('company', 987), ('military', 858), ('event', 783), ('government', 763), ('list', 622), ('voice', 558), ('language', 478), ('job', 384), ('record_label', 333), ('computer', 310), ('party', 282), ('channel', 225), ('food', 177), ('brand', 170), ('religion', 160)]
-all labels:  ['taxonomy', 'government', 'military', 'study', 'organization', 'location', 'sport', 'company', 'program', 'award', 'film', 'voice', 'person', 'language', 'fiction', 'event', 'computer', 'list', 'job', 'religion', 'brand', 'food', 'party', 'channel', 'record_label']
+all labels cnt:  [('film', 7370), ('award', 7175), ('person', 7029), ('location', 6039), ('organization', 2970), ('study', 2940), ('sport', 2542), ('taxonomy', 2194), ('program', 1792), ('fiction', 1061), ('company', 987), ('military', 858), ('event', 783), ('government', 763), ('list', 622), ('voice', 558), ('language', 478), ('job', 384), ('record_label', 333), ('computer', 310), ('party', 282), ('channel', 225), ('food', 177), ('brand', 170), ('religion', 160)]
+all labels:  ['taxonomy', 'sport', 'location', 'organization', 'government', 'study', 'military', 'award', 'company', 'film', 'program', 'person', 'voice', 'language', 'fiction', 'event', 'computer', 'list', 'job', 'religion', 'brand', 'food', 'party', 'channel', 'record_label']
 FB15K237.content:
 14541
 100
