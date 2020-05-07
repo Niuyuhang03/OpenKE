@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 
 
-dataset_str = "FB15K237"
+dataset_str = "WN18RR"
 min = 0
 min_num = 100000
 for i in range(14541):
@@ -22,7 +22,7 @@ for i in range(14541):
                 new_selected_nodes.add(edges_unordered[index][0])
                 new_selected_nodes.add(edges_unordered[index][1])
                 new_selected_relations.add(edges_unordered[index][2])
-            if len(new_selected_nodes) > 1000:
+            if len(new_selected_nodes) > 4000:
                 flag = 1
                 break
         if flag:
