@@ -6,9 +6,9 @@ entity_path = "../{}_result/{}.content".format(dataset_str, dataset_str)
 relation_path = "../{}_result/{}.rel".format(dataset_str, dataset_str)
 cites_path = "../{}_result/{}.cites".format(dataset_str, dataset_str)
 
-content_output_path = "{}_half.content".format(dataset_str)
-rel_output_path = "{}_half.rel".format(dataset_str)
-cites_output_path = "{}_half.cites".format(dataset_str)
+content_output_path = "{}_4000.content".format(dataset_str)
+rel_output_path = "{}_4000.rel".format(dataset_str)
+cites_output_path = "{}_4000.cites".format(dataset_str)
 
 idx_features_labels = np.genfromtxt(entity_path, dtype=np.dtype(str))
 edges_unordered = np.genfromtxt(cites_path, dtype=np.int32)
