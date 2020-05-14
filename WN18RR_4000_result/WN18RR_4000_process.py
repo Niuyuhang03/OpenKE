@@ -19,17 +19,18 @@ step = 4
 
 while step:
     new_selected_nodes = set()
-    new_selected_relations = set()
     for index in range(len(edges_unordered)):
         if edges_unordered[index][0] in selected_entity or edges_unordered[index][1] in selected_entity:
             new_selected_nodes.add(edges_unordered[index][0])
             new_selected_nodes.add(edges_unordered[index][1])
-            new_selected_relations.add(edges_unordered[index][2])
     selected_entity |= new_selected_nodes
-    selected_relations |= new_selected_relations
 
     step -= 1
 # print("len(selected_entity): {}, len(selected_relations): {}".format(len(selected_entity), len(selected_relations)))
+
+for index in range(len(edges_unordered)):
+    if edges_unordered[index][0] in selected_entity and edges_unordered[index][1] in selected_entity:
+        selected_relations.add(edges_unordered[index][2])
 
 entity_file = open(entity_path, 'r')
 entity_lines = entity_file.readlines()
